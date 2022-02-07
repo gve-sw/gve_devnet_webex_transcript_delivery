@@ -1,0 +1,16 @@
+certifi==2021.10.8
+charset-normalizer==2.0.8
+click==8.0.3
+Flask==2.0.2
+future==0.18.2
+idna==3.3
+itsdangerous==2.0.1
+Jinja2==3.0.3
+MarkupSafe==2.0.1
+PyJWT==2.3.0
+python-dotenv==0.19.2
+requests==2.26.0
+requests-toolbelt==0.9.1
+urllib3==1.26.7
+webexteamssdk==1.6
+Werkzeug==2.0.2
