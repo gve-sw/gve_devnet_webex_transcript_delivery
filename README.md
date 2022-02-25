@@ -13,11 +13,15 @@ In this Proof of Value (PoV), we have created a simple script that registers a w
 
 3. After successful authentication and authorization, the application will retrieve a token and you will be redirected to the following page: 
 
+![choose_space](IMAGES/choose_space.jpg)
+
+4. After having chosen the Webex space where you would like to send your message to, you will be redirected to the following page:
+
 ![success](IMAGES/success2.png)
 
 In the background, the application will continue to listen in on the webhook. Once a recording becomes available, then the webhook will trigger our application and we will start the process of retrieving the transcript. Please note that the transcript takes longer than the recording to be ready. A back-off script has been implemented in the script in order to wait an appropriate amount of time for the transcript to be ready. 
 
-4. If you want to remove the webhook, then you can click the button **Remove webhook** and after it has been successfully removed, you will see the following page:
+5. If you want to remove the webhook, then you can click the button **Remove webhook** and after it has been successfully removed, you will see the following page:
 
 ![final](IMAGES/final.png)
 
@@ -177,13 +181,13 @@ The following commands are executed in the terminal.
 
     ```python
     WEBEX_BOT_TOKEN = "<insert_webex_bot_token>"
-    WEBEX_ROOM_ID = "<insert_webex_room_id>"
-    WEBHOOK_URL = "<insert_webhook_url>" # if testing locally, then use ngrok. Ngrok instructions are provided under the section 'usage'
+    WEBEX_BOT_EMAIL = "<insert_webex_bot_email>"
+    WEBHOOK_URL = "<insert_webhook_url>"
 
     WEBEX_INTEGRATION_CLIENT_ID = "<insert_webex_integration_client_id>"
     WEBEX_INTEGRATION_CLIENT_SECRET= "<insert_webex_integration_client_secret>"
     WEBEX_INTEGRATION_REDIRECT_URI = "http://127.0.0.1:5000/webexoauth"
-    WEBEX_INTEGRATION_SCOPE = "meeting:preferences_read meeting:recordings_read meeting:admin_recordings_read spark-compliance:meetings_write spark:all spark-compliance:webhooks_write spark-compliance:webhooks_read"
+    WEBEX_INTEGRATION_SCOPE = "meeting:schedules_read meeting:recordings_read meeting:preferences_read spark-compliance:meetings_write spark:all spark-compliance:webhooks_write spark-compliance:webhooks_read"
     ```
 
 

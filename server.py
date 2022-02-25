@@ -11,6 +11,10 @@ IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 or implied.
 """
 
+__author__ = "Simon Fang <sifang@cisco.com>"
+__copyright__ = "Copyright (c) 2022 Cisco and/or its affiliates."
+__license__ = "Cisco Sample Code License, Version 1.1"
+
 # Import Section
 from flask import Flask, request, render_template, redirect, jsonify
 from dotenv import load_dotenv
@@ -29,9 +33,8 @@ load_dotenv()
 ########################
 
 WEBEX_BASE_URL = "https://webexapis.com/v1"
-
 WEBEX_BOT_TOKEN = os.getenv("WEBEX_BOT_TOKEN")
-WEBEX_ROOM_ID = os.getenv("WEBEX_ROOM_ID")
+WEBEX_BOT_EMAIL = os.getenv("WEBEX_BOT_EMAIL")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 WEBEX_INTEGRATION_CLIENT_ID = os.getenv("WEBEX_INTEGRATION_CLIENT_ID")
@@ -40,6 +43,7 @@ WEBEX_INTEGRATION_REDIRECT_URI = os.getenv("WEBEX_INTEGRATION_REDIRECT_URI")
 WEBEX_INTEGRATION_SCOPE = os.getenv("WEBEX_INTEGRATION_SCOPE")
 
 webex_access_token = ""
+WEBEX_ROOM_ID = ""
 
 app = Flask(__name__)
 
@@ -148,6 +152,29 @@ def get_meeting_transcript(transcript_id, meeting_id):
     response.raise_for_status()
     return response
 
+def get_rooms():
+    # Download list of rooms: https://developer.webex.com/docs/api/v1/rooms/list-rooms
+    url = f"{WEBEX_BASE_URL}/rooms?sortBy=lastactivity&type=group&max=1000"
+    response = requests.get(url, headers = {
+        "Authorization" : f"Bearer {webex_access_token}"
+    })
+    response.raise_for_status()
+    rooms = response.json()['items']
+    return rooms
+
+def add_bot_to_room(room_id):
+    # Download list of rooms: https://developer.webex.com/docs/api/v1/rooms/list-rooms
+    url = f"{WEBEX_BASE_URL}/memberships"
+    payload = {
+        "roomId": room_id,
+        "personEmail": WEBEX_BOT_EMAIL 
+    }
+    response = requests.post(url, json=payload, headers = {
+        "Authorization" : f"Bearer {webex_access_token}"
+    })
+    print(response.json())
+    return response
+
 
 ##############
 ### Routes ###
@@ -198,6 +225,20 @@ def webexoauth():
         app.logger.error("No webhook is registered")
         sys.exit()
 
+    spaces = get_rooms()
+    print(spaces)
+    return render_template('choose_space.html', spaces=spaces)
+
+@app.route('/select_space', methods=['GET', 'POST'])
+def select_space():
+    if request.method == "POST":
+        form_data = request.form
+        app.logger.info(form_data)
+        global WEBEX_ROOM_ID
+        WEBEX_ROOM_ID = form_data['space']
+        add_bot_response = add_bot_to_room(WEBEX_ROOM_ID)
+        if add_bot_response.status_code == 409:
+            app.logger.info("Bot has been added to room already")
     return render_template('success.html')
 
 @app.route('/webhook_listener', methods=['GET','POST'])
